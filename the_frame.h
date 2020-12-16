@@ -104,7 +104,8 @@ public:
         connect(play_video,SIGNAL(clicked()),this,SLOT(playVideo()));
         connect(pause_video,SIGNAL(clicked()),this,SLOT(pauseVideo()));
         connect(stop_video,SIGNAL(clicked()),this,SLOT(stopVideo()));
-        connect(volume_slider,SIGNAL(sliderMoved(int)),this,SLOT(changeVolume(int)));
+//        connect(volume_slider,SIGNAL(sliderMoved(int)),this,SLOT(setValue(int)));
+        connect(volume_slider,SIGNAL(valueChanged(int)),this,SLOT(changeVolume(int)));
 
         this->setLayout(frameLayout);
     }
