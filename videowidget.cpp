@@ -21,12 +21,10 @@ void VideoWidget::keyPressEvent(QKeyEvent *event)
         setFullScreen(false);
         setGeometry(9, 9, 781, 491);
         event->accept();
-    }
-    else if (event->key() == Qt::Key_Enter && event->modifiers() & Qt::Key_Alt) {
+    }else if (event->key() == Qt::Key_Enter && event->modifiers() & Qt::Key_Alt) {
         setFullScreen(!isFullScreen());
         event->accept();
-    }
-    else {
+    }else {
         QVideoWidget::keyPressEvent(event);
     }
 }

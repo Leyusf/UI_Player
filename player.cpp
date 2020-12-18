@@ -19,9 +19,6 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     volumn = 0;
     player->setVolume(volumn);
     this->setState(player->state());
-    qInfo() << "Supported audio roles:";
-    for (QAudio::Role role : player->supportedAudioRoles())
-        qInfo() << "    " << role;
     initPlayLists();
     player->setPlaylist(playlist);
     connect(playlist, &QMediaPlaylist::currentIndexChanged,
@@ -31,6 +28,9 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     playlistModel->setPlaylist(playlist);
     ui->playlistView->setModel(playlistModel);
     ui->playlistView->setCurrentIndex(playlistModel->index(playlist->currentIndex(), 0));
+    ItemDelegate *m_delegate = new ItemDelegate(this);
+    ui->playlistView->setItemDelegate(m_delegate);
+    ui->playlistView->setSpacing(15);
     connect(ui->oB, &QPushButton::clicked, this, &Player::add);
     connect(ui->aB, &QPushButton::clicked, this, &Player::open);
     connect(ui->rB, &QPushButton::clicked, this, &Player::remove);
@@ -73,7 +73,7 @@ void Player::playlistPositionChanged(int currentItem)
     ui->playlistView->setCurrentIndex(playlistModel->index(currentItem, 0));
 }
 
-static bool isPlaylist(const QUrl &url) // Check for ".m3u" playlists.
+static bool isPlaylist(const QUrl &url)
 {
     if (!url.isLocalFile())
         return false;
@@ -85,36 +85,26 @@ static bool isPlaylist(const QUrl &url) // Check for ".m3u" playlists.
 void Player::addToPlaylist(const QList<QUrl> &urls)
 {
     for (auto &url: urls) {
-
         if (isPlaylist(url)){
             playlist->load(url);
 
-        }
-        else{
+        }else{
             playlistVector->at(0)->addMedia(url);
-
             string filename = url.fileName().toStdString();
-
             int posf = filename.find_last_of('_');
             int pose = filename.find_last_of('.');
             string name(filename.substr(posf+1,pose-posf-1) );
-            //获得后缀
             if (name == "basketball"){
                 playlistVector->at(1)->addMedia(url);
-            }
-            else if (name == "walk"){
+            }else if (name == "walk"){
                 playlistVector->at(2)->addMedia(url);
-            }
-            else if (name == "esport"){
+            }else if (name == "esport"){
                 playlistVector->at(3)->addMedia(url);
-            }
-            else if (name == "ride"){
+            }else if (name == "ride"){
                 playlistVector->at(4)->addMedia(url);
-            }
-            else if (name == "swimming"){
+            }else if (name == "swimming"){
                 playlistVector->at(5)->addMedia(url);
-            }
-            else{
+            }else{
                 playlistVector->at(6)->addMedia(url);
             }
         }
@@ -137,17 +127,15 @@ void Player::open()
     fileDialog.setWindowTitle(tr("Open Files"));
     QStringList supportedMimeTypes = player->supportedMimeTypes();
     if (!supportedMimeTypes.isEmpty()) {
-        supportedMimeTypes.append("audio/x-m3u"); // MP3 playlists
+        supportedMimeTypes.append("audio/x-m3u");
+        // MP3 playlists
         fileDialog.setMimeTypeFilters(supportedMimeTypes);
     }
     fileDialog.setDirectory(QStandardPaths::standardLocations
         (QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
-
-
     if (fileDialog.exec() == QDialog::Accepted){
         addToPlaylist(fileDialog.selectedUrls());
     }
-
 }
 
 
@@ -176,7 +164,6 @@ void Player::positionChanged(qint64 progress)
 void Player::metaDataChanged()
 {
     if (player->isMetaDataAvailable()) {
-
         if (ui->v_coverLabel) {
             QUrl url = player->metaData(QMediaMetaData::CoverArtUrlLarge).value<QUrl>();
 
@@ -230,8 +217,7 @@ void Player::slotGrabFullScreen()
     QString filePathName = "full-";
     filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
     filePathName += ".jpg";
-    if(!screen->grabWindow(0).save(filePathName, "jpg"))
-    {
+    if(!screen->grabWindow(0).save(filePathName, "jpg")){
         cout<<"save full screen failed"<<endl;
     }
 }
@@ -240,7 +226,6 @@ void Player::setState(QMediaPlayer::State state)
 {
     if (state != playerState) {
         playerState = state;
-
         switch (state) {
         case QMediaPlayer::StoppedState:
             ui->stopB->setEnabled(false);
@@ -282,7 +267,6 @@ int Player::volume() const
     qreal linearVolume =  QAudio::convertVolume(ui->volumn_slider->value() / qreal(100),
                                                 QAudio::LogarithmicVolumeScale,
                                                 QAudio::LinearVolumeScale);
-
     return qRound(linearVolume * 100);
 }
 
@@ -290,16 +274,13 @@ void Player::setMuted(bool muted)
 {
     if (muted != playerMuted) {
         playerMuted = muted;
-
         ui->sB->setIcon(style()->standardIcon(muted
                 ? QStyle::SP_MediaVolumeMuted
                 : QStyle::SP_MediaVolume));
-
         if (muted ==true){
             volumn = ui->volumn_slider->value();
             ui->volumn_slider->setValue(0);
-        }
-        else{
+        }else{
             ui->volumn_slider->setValue(volumn);
         }
     }
@@ -351,8 +332,7 @@ void Player::add()
     if (path==""){
         fileDialog.setDirectory(QStandardPaths::standardLocations
            (QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
-    }
-    else{
+    }else{
         fileDialog.setDirectory(Qpath);
     }
 
