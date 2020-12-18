@@ -9,6 +9,7 @@
 #include <QMediaMetaData>
 #include <QtWidgets>
 #include <QComboBox>
+#include <iostream>
 
 using namespace std;
 Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
@@ -21,11 +22,10 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     qInfo() << "Supported audio roles:";
     for (QAudio::Role role : player->supportedAudioRoles())
         qInfo() << "    " << role;
-    //playlist = new QMediaPlaylist();
     initPlayLists();
     player->setPlaylist(playlist);
-    connect(playlist, &QMediaPlaylist::currentIndexChanged, this,
-            &Player::playlistPositionChanged);
+    connect(playlist, &QMediaPlaylist::currentIndexChanged,
+            this, &Player::playlistPositionChanged);
     player->setVideoOutput(ui->videoWidget);
     playlistModel = new PlaylistModel(this);
     playlistModel->setPlaylist(playlist);
@@ -34,6 +34,7 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     connect(ui->oB, &QPushButton::clicked, this, &Player::add);
     connect(ui->aB, &QPushButton::clicked, this, &Player::open);
     connect(ui->rB, &QPushButton::clicked, this, &Player::remove);
+    connect(ui->screenshot, &QPushButton::clicked, this, &Player::slotGrabFullScreen);
     player->setNotifyInterval(20);
     ui->stopB->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     ui->stopB->setEnabled(false);
@@ -50,14 +51,15 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     connect(ui->volumn_slider, &QSlider::valueChanged, player, &QMediaPlayer::setVolume);
     connect(player, &QMediaPlayer::durationChanged, this, &Player::durationChanged);
     connect(player, &QMediaPlayer::positionChanged, this, &Player::positionChanged);
-    connect(player, QOverload<>::of(&QMediaPlayer::metaDataChanged), this,
-            &Player::metaDataChanged);
+    connect(player, QOverload<>::of(&QMediaPlayer::metaDataChanged),
+            this, &Player::metaDataChanged);
     connect(ui->playlistView, &QAbstractItemView::activated, this, &Player::jump);
     connect(player, &QMediaPlayer::stateChanged, this, &Player::setState);
     connect(player, &QMediaPlayer::mutedChanged, this, &Player::setMuted);
     ui->v_slider->setRange(0, player->duration());
     connect(ui->v_slider, &QSlider::sliderMoved, this, &Player::seek);
     connect(ui->classBox,SIGNAL(currentIndexChanged(int)), this, SLOT(ClassChanged(int)));
+    buttonStyle(ui);
     metaDataChanged();
 }
 
@@ -100,17 +102,20 @@ void Player::addToPlaylist(const QList<QUrl> &urls)
             if (name == "basketball"){
                 playlistVector->at(1)->addMedia(url);
             }
-            else if (name == "running"){
+            else if (name == "walk"){
                 playlistVector->at(2)->addMedia(url);
             }
             else if (name == "esport"){
                 playlistVector->at(3)->addMedia(url);
             }
-            else if (name == "soccer"){
+            else if (name == "ride"){
                 playlistVector->at(4)->addMedia(url);
             }
-            else{
+            else if (name == "swimming"){
                 playlistVector->at(5)->addMedia(url);
+            }
+            else{
+                playlistVector->at(6)->addMedia(url);
             }
         }
     }
@@ -208,7 +213,7 @@ void Player::remove()
     int index = playlist->currentIndex();
     QMediaContent m = playlist->currentMedia();
 
-    for (int i=0;i<6;i++){
+    for (int i=0;i<7;i++){
         int t = playlistVector->at(i)->mediaCount();
         for (int j=0;j<t;j++){
             if (m==playlistVector->at(i)->media(j)){
@@ -217,6 +222,18 @@ void Player::remove()
         }
     }
     playlist->removeMedia(index);
+}
+
+void Player::slotGrabFullScreen()
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QString filePathName = "full-";
+    filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
+    filePathName += ".jpg";
+    if(!screen->grabWindow(0).save(filePathName, "jpg"))
+    {
+        cout<<"save full screen failed"<<endl;
+    }
 }
 
 void Player::setState(QMediaPlayer::State state)
@@ -297,7 +314,7 @@ void Player::initPlayLists(){
     indexPlaylist = 0;
     playlist = new QMediaPlaylist();
     playlistVector = new QVector<QMediaPlaylist*>();
-    for (int i=0;i<6;i++){
+    for (int i=0;i<7;i++){
         QMediaPlaylist *tmp = new QMediaPlaylist();
         playlistVector->append(tmp);
     }
@@ -345,12 +362,56 @@ void Player::add()
         QDirIterator it(dir);
         while (it.hasNext()){
             QString f = it.next();
-            if (f.contains(".wmv")){
+#if defined (_WIN32)
+            if (f.contains(".wmv")){  // windows
                 QUrl* url = new QUrl(QUrl::fromLocalFile(f));
                 urls<<*url;
             }
+#else
+            if (f.contains(".mp4")){  // mac/linux
+                QUrl* url = new QUrl(QUrl::fromLocalFile(f));
+                urls<<*url;
+            }
+#endif
         }
         addToPlaylist(urls);
     }
     ui->oB->setEnabled(false);
+}
+
+void Player::buttonStyle(Ui::Player* ui){
+    ui->stopB->setStyleSheet("QAbstractButton{\
+                             background-color:#99CCFF}\
+                             QAbstractButton:hover{\
+                             background-color:#1E90FF}");
+    ui->preB->setStyleSheet("QAbstractButton{\
+                             background-color:#99CCFF}\
+                             QAbstractButton:hover{\
+                             background-color:#1E90FF}");
+    ui->pauseB->setStyleSheet("QAbstractButton{\
+                              background-color:#99CCFF}\
+                              QAbstractButton:hover{\
+                              background-color:#1E90FF}");
+    ui->nextB->setStyleSheet("QAbstractButton{\
+                              background-color:#99CCFF}\
+                              QAbstractButton:hover{\
+                              background-color:#1E90FF}");
+    ui->oB->setStyleSheet("QAbstractButton{\
+                           background-color:#99CCFF}\
+                           QAbstractButton:hover{\
+                           background-color:#1E90FF}");
+    ui->rB->setStyleSheet("QAbstractButton{\
+                           background-color:#99CCFF}\
+                           QAbstractButton:hover{\
+                           background-color:#1E90FF}");
+    ui->aB->setStyleSheet("QAbstractButton{\
+                           background-color:#99CCFF}\
+                           QAbstractButton:hover{\
+                           background-color:#1E90FF}");
+    ui->sB->setStyleSheet("QAbstractButton{\
+                           background-color:#FFEFD5}");
+    ui->screenshot->setStyleSheet("QAbstractButton{\
+                                   background-color:#B4EEB4}\
+                                   QAbstractButton:hover{\
+                                   background-color:#BCEE68}");
 }
