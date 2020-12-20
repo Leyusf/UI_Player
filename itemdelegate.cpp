@@ -5,6 +5,7 @@
 #include <QStyle>
 #include <QEvent>
 #include <QDebug>
+#include <QPainterPath>
 #include "itemdef.h"
 
 ItemDelegate::ItemDelegate(QObject *parent) :
