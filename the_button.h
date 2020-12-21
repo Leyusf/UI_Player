@@ -8,21 +8,15 @@
 
 #include <QPushButton>
 #include <QUrl>
-#include <string>
-#include <iostream>
 
-using namespace std;
+
 class TheButtonInfo {
+
 public:
     QUrl* url; // video file to play
     QIcon* icon; // icon to display
-    std::string name;
-    int time;
 
-    TheButtonInfo ( QUrl* url, QIcon* icon, std::string lname, int ltime) : url (url), icon (icon) {
-        name = std::string(lname);
-        time = ltime;
-    }
+    TheButtonInfo ( QUrl* url, QIcon* icon) : url (url), icon (icon) {}
 };
 
 class TheButton : public QPushButton {
@@ -30,13 +24,14 @@ class TheButton : public QPushButton {
 
 public:
     TheButtonInfo* info;
+
     TheButton(QWidget *parent) :  QPushButton(parent) {
          setIconSize(QSize(200,110));
+
          connect(this, SIGNAL(released()), this, SLOT (clicked() ));
          // if QPushButton clicked...then run clicked() below
 
     }
-
 
     void init(TheButtonInfo* i);
     // 将视频信息(视频路径和缩略图)与按钮相关联

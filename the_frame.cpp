@@ -35,19 +35,3 @@ void TheFrame::stopVideo(){
 void TheFrame::changeVolume(int i){
     player->setVolume(i);
 }
-
-//void TheFrame::halfChanged(){
-//    player->setPlaybackRate(0.5);
-//}
-
-//void TheFrame::normalChanged(){
-//    player->setPlaybackRate(1.0);
-//}
-
-//void TheFrame::fastChanged(){
-//    player->setPlaybackRate(1.5);
-//}
-
-//void TheFrame::doubleChanged(){
-//    player->setPlaybackRate(2.0);
-//}

@@ -28,7 +28,6 @@
 #include "the_player.h"
 #include "the_button.h"
 #include "the_frame.h"
-#include "reader.h"
 
 
 using namespace std;
@@ -41,7 +40,6 @@ vector<TheButtonInfo> getInfoIn (string loc) {
     QDir dir(QString::fromStdString(loc) );
     QDirIterator it(dir);
 
-    int i=0;
     while (it.hasNext()) { // for all files
 
         QString f = it.next();
@@ -55,18 +53,13 @@ vector<TheButtonInfo> getInfoIn (string loc) {
 #endif
 
             QString thumb = f.left( f .length() - 4) +".png";
-
             if (QFile(thumb).exists()) { // if a png thumbnail exists
                 QImageReader *imageReader = new QImageReader(thumb);
                     QImage sprite = imageReader->read(); // read the thumbnail
                     if (!sprite.isNull()) {
                         QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
                         QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
-                        string path = f.toStdString();
-                        int pos = path.find_last_of('/');
-                        string name(path.substr(pos + 1) );
-                        int time[6] = {18,15,11,9,8,9};
-                        out . push_back(TheButtonInfo( url , ico  , name , time[i++]) ); // add to the output list
+                        out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
                     }
                     else
                         qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
@@ -75,12 +68,7 @@ vector<TheButtonInfo> getInfoIn (string loc) {
                 qDebug() << "warning: skipping video because I couldn't find thumbnail " << thumb << endl;
         }
     }
-    QString emp = "empty.png";
-    QImageReader *imageReader = new QImageReader(emp);
-        QImage sprite = imageReader->read(); // read the thumbnail
-            QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
-            QUrl* url = new QUrl(QUrl::fromLocalFile( NULL )); // convert the file location to a generic url
-            out . push_back(TheButtonInfo(url, ico, emp.toStdString() , 0)); // add to the output list
+
     return out;
 }
 
@@ -136,20 +124,14 @@ int main(int argc, char *argv[]) {
                    player,SLOT (changeState(int)));
     frame->connect(frame, SIGNAL(replay()),
                    player,SLOT (replay()));
-
     // a row of buttons
     QWidget *buttonWidget = new QWidget();
     // a list of the buttons
     vector<TheButton*> buttons;
     // the buttons are arranged horizontally
-    QVBoxLayout *layout = new QVBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout();
     buttonWidget->setLayout(layout);
 
-    Reader* reader = new Reader();
-    reader->setMaximumHeight(40);
-
-    reader->connect(reader,SIGNAL(changeListByClass(int)),player,SLOT(changeListByClass(int)));
-    reader->connect(reader,SIGNAL(changeListByTime(int)),player,SLOT(changeListByTime(int)));
 
 
     // create the four buttons
@@ -166,30 +148,17 @@ int main(int argc, char *argv[]) {
 
     // create the main window and layout
     QWidget window;
-    QHBoxLayout *lay = new QHBoxLayout();
-    QVBoxLayout *right = new QVBoxLayout();
     QVBoxLayout *top = new QVBoxLayout();
-    QWidget left;
-
-    left.setLayout(top);
-    left.setMinimumSize(800, 680);
-    left.setMinimumWidth(750);
-    reader->setMinimumSize(300,50);
-    window.setLayout(lay);
+    window.setLayout(top);
     window.setWindowTitle("tomeo");
-    window.setMinimumSize(1100, 680);
+    window.setMinimumSize(800, 680);
 
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
-
     top->addWidget(frame);
+    top->addWidget(buttonWidget);
+
     // showtime!
-    lay->addWidget(&left);
-    QWidget* r = new QWidget();
-    r->setLayout(right);
-    right->addWidget(reader);
-    right->addWidget(buttonWidget);
-    lay->addWidget(r);
     window.show();
 
     // wait for the app to terminate

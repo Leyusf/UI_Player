@@ -50,15 +50,10 @@ public:
         // 播放速度
         speedLabel=new QLabel(tr("Speed:"));
         speedLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
-//        speedSpinBox=new QSpinBox;
-//        speedSpinBox->setRange(1,500);
-//        speedSpinBox->setValue(100);
         half_speed = new QPushButton(QStringLiteral("x0.5"));
         normal_speed = new QPushButton(QStringLiteral("x1.0"));
         fast_speed = new QPushButton(QStringLiteral("x1.5"));
         double_speed = new QPushButton(QStringLiteral("x2.0"));
-
-//        speedSpinBox->setSuffix(tr("%"));
 
         play_video = new QPushButton(QStringLiteral("play"));
         pause_video = new QPushButton(QStringLiteral("pause"));
@@ -83,12 +78,6 @@ public:
         QGridLayout* frameLayout = new QGridLayout;
         frameLayout->addWidget(label,1,0);
         frameLayout->addWidget(slider,1,1,1,4);
-//        frameLayout->addWidget(speedLabel,1,6);
-//        frameLayout->addWidget(half_speed,1,6);
-//        frameLayout->addWidget(normal_speed,1,7);
-//        frameLayout->addWidget(fast_speed,1,8);
-//        frameLayout->addWidget(double_speed,1,9);
-//        frameLayout->addWidget(speedSpinBox,1,7);
         frameLayout->addWidget(play_video,2,0);
         frameLayout->addWidget(pause_video,2,1);
         frameLayout->addWidget(stop_video,2,2);
@@ -97,15 +86,10 @@ public:
 
         connect(slider,SIGNAL(sliderMoved(int)),this,SLOT(sliderChanged(int)));
         connect(slider,SIGNAL(sliderReleased()),this,SLOT(sliderReleased()));
-//        connect(half_speed,SIGNAL(clicked()),this,SLOT(halfChanged()));
-//        connect(normal_speed,SIGNAL(clicked()),this,SLOT(normalChanged()));
-//        connect(fast_speed,SIGNAL(clicked()),this,SLOT(fastChanged()));
-//        connect(double_speed,SIGNAL(clicked()),this,SLOT(doubleChanged()));
         connect(play_video,SIGNAL(clicked()),this,SLOT(playVideo()));
         connect(pause_video,SIGNAL(clicked()),this,SLOT(pauseVideo()));
         connect(stop_video,SIGNAL(clicked()),this,SLOT(stopVideo()));
-//        connect(volume_slider,SIGNAL(sliderMoved(int)),this,SLOT(setValue(int)));
-        connect(volume_slider,SIGNAL(valueChanged(int)),this,SLOT(changeVolume(int)));
+        connect(volume_slider,SIGNAL(sliderMoved(int)),this,SLOT(changeVolume(int)));
 
         this->setLayout(frameLayout);
     }
@@ -121,10 +105,6 @@ public slots:
     void UpGrateSlider(qint64 position);
     void getTotalTime(int time);
     void sliderReleased();
-//    void halfChanged();
-//    void normalChanged();
-//    void fastChanged();
-//    void doubleChanged();
     void playVideo();
     void pauseVideo();
     void stopVideo();
