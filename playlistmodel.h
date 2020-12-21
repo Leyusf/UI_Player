@@ -3,6 +3,8 @@
 
 #include <QAbstractItemModel>
 #include <QScopedPointer>
+#include "itemdef.h"
+#include "itemdelegate.h"
 
 QT_BEGIN_NAMESPACE
 class QMediaPlaylist;
