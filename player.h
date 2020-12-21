@@ -59,10 +59,12 @@ private slots:
     void open();
     void add();
     void remove();
+    void slotGrabFullScreen();
     void jump(const QModelIndex &index);
     void metaDataChanged();
     void durationChanged(qint64 duration);
     void positionChanged(qint64 progress);
     void seek(int seconds);
+    void buttonStyle(Ui::Player* ui);
 };
 #endif // PLAYER_H
