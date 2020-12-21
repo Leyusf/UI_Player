@@ -14,6 +14,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QLayout>
+#include <string>
 
 
 using namespace std;
@@ -40,7 +41,7 @@ public:
         mTimer->setInterval(1000); // 1000ms is one second between ...
         mTimer->start();
 
-        connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) );
+        //connect( mTimer, SIGNAL (timeout()), SLOT ( shuffle() ) );
 
         setNotifyInterval(20);
         connect(this,SIGNAL(positionChanged(qint64)),this,SLOT(OnPositionChanged(qint64)));
@@ -76,6 +77,10 @@ public slots:
     void changeState(int);
 
     void replay();
+
+    void changeListByClass(int);
+
+    void changeListByTime(int index);
 
 signals:
     void UpGrateSlider(qint64 position);
