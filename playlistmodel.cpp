@@ -61,10 +61,12 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role) const {
                     itemdata.pix = new QPixmap(pixmap);
                     itemdata.name = new QString(name);
                     value.setValue(itemdata);
-                } else {
+                }
+                else {
                     qDebug() << "warning: I couldn't process thumbnail " << thumb << endl;
                 }
-            } else {
+            }
+            else {
                 qDebug() << "warning: I couldn't find thumbnail " << thumb << endl;
                 int pose = path.toStdString().find_last_of("/");
                 thumb = path.left(pose) + "/nodata.png";
@@ -76,7 +78,8 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role) const {
                     itemdata.pix = new QPixmap(pixmap);
                     itemdata.name = new QString(name);
                     value.setValue(itemdata);
-                } else {
+                }
+                else {
                     qDebug() << "warning: I couldn't process thumbnail " << thumb << endl;
                 }
             }

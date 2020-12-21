@@ -17,7 +17,7 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     player = new QMediaPlayer(this);
     player->setAudioRole(QAudio::VideoRole);
     volumn = 0;
-    player->setVolume(volumn);
+    player->setVolume(volumn);  // set the inital volume of the video player
     this->setState(player->state());
     initPlayLists();
     player->setPlaylist(playlist);
@@ -36,18 +36,18 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     connect(ui->rB, &QPushButton::clicked, this, &Player::remove);
     connect(ui->screenshot, &QPushButton::clicked, this, &Player::slotGrabFullScreen);
     player->setNotifyInterval(20);
-    ui->stopB->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    ui->stopB->setIcon(style()->standardIcon(QStyle::SP_MediaStop));  // add icon to the button
     ui->stopB->setEnabled(false);
     connect(ui->stopB, &QAbstractButton::clicked, player, &QMediaPlayer::stop);
-    ui->preB->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
+    ui->preB->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));  // add icon to the button
     connect(ui->preB, &QAbstractButton::clicked, playlist, &QMediaPlaylist::previous);
-    ui->pauseB->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    ui->pauseB->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));  // add icon to the button
     connect(ui->pauseB, &QAbstractButton::clicked, this, &Player::playClicked);
-    ui->nextB->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    ui->nextB->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));  // add icon to the button
     connect(ui->nextB, &QAbstractButton::clicked, playlist, &QMediaPlaylist::next);
-    ui->sB->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
+    ui->sB->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));  // add icon to the button
     connect(ui->sB, &QAbstractButton::clicked, this, &Player::muteClicked);
-    ui->volumn_slider->setRange(0, 100);
+    ui->volumn_slider->setRange(0, 100);  // set the range of the volume
     connect(ui->volumn_slider, &QSlider::valueChanged, player, &QMediaPlayer::setVolume);
     connect(player, &QMediaPlayer::durationChanged, this, &Player::durationChanged);
     connect(player, &QMediaPlayer::positionChanged, this, &Player::positionChanged);
@@ -56,10 +56,10 @@ Player::Player(QWidget *parent): QMainWindow(parent), ui(new Ui::Player){
     connect(ui->playlistView, &QAbstractItemView::activated, this, &Player::jump);
     connect(player, &QMediaPlayer::stateChanged, this, &Player::setState);
     connect(player, &QMediaPlayer::mutedChanged, this, &Player::setMuted);
-    ui->v_slider->setRange(0, player->duration());
+    ui->v_slider->setRange(0, player->duration());  // set the length range of the slider
     connect(ui->v_slider, &QSlider::sliderMoved, this, &Player::seek);
     connect(ui->classBox,SIGNAL(currentIndexChanged(int)), this, SLOT(ClassChanged(int)));
-    buttonStyle(ui);
+    buttonStyle(ui);  // set button style
     metaDataChanged();
 }
 
@@ -68,12 +68,12 @@ Player::~Player()
     delete ui;
 }
 
-void Player::playlistPositionChanged(int currentItem)
+void Player::playlistPositionChanged(int currentItem)  // change the position of the video player in the play list
 {
     ui->playlistView->setCurrentIndex(playlistModel->index(currentItem, 0));
 }
 
-static bool isPlaylist(const QUrl &url)
+static bool isPlaylist(const QUrl &url)  // Check for ".m3u" playlists.
 {
     if (!url.isLocalFile())
         return false;
@@ -82,29 +82,36 @@ static bool isPlaylist(const QUrl &url)
                                                            Qt::CaseInsensitive);
 }
 
-void Player::addToPlaylist(const QList<QUrl> &urls)
+void Player::addToPlaylist(const QList<QUrl> &urls)  // add video to the play list
 {
     for (auto &url: urls) {
         if (isPlaylist(url)){
             playlist->load(url);
 
-        }else{
+        }
+        else{
             playlistVector->at(0)->addMedia(url);
             string filename = url.fileName().toStdString();
             int posf = filename.find_last_of('_');
             int pose = filename.find_last_of('.');
             string name(filename.substr(posf+1,pose-posf-1) );
+            // get the suffix of the file name
             if (name == "basketball"){
                 playlistVector->at(1)->addMedia(url);
-            }else if (name == "walk"){
+            }
+            else if (name == "walk"){
                 playlistVector->at(2)->addMedia(url);
-            }else if (name == "esport"){
+            }
+            else if (name == "esport"){
                 playlistVector->at(3)->addMedia(url);
-            }else if (name == "ride"){
+            }
+            else if (name == "ride"){
                 playlistVector->at(4)->addMedia(url);
-            }else if (name == "swimming"){
+            }
+            else if (name == "swimming"){
                 playlistVector->at(5)->addMedia(url);
-            }else{
+            }
+            else{
                 playlistVector->at(6)->addMedia(url);
             }
         }
@@ -120,7 +127,7 @@ void Player::addToPlaylist(const QList<QUrl> &urls)
     file.remove();
 }
 
-void Player::open()
+void Player::open()  //open a video in the specified path
 {
     QFileDialog fileDialog(this);
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -139,7 +146,7 @@ void Player::open()
 }
 
 
-void Player::jump(const QModelIndex &index)
+void Player::jump(const QModelIndex &index)  // jump to another video and play it
 {
     if (index.isValid()) {
         playlist->setCurrentIndex(index.row());
@@ -195,7 +202,7 @@ void Player::seek(int seconds)
     player->setPosition(seconds * 1000);
 }
 
-void Player::remove()
+void Player::remove()  // remove a video from the playlist
 {
     int index = playlist->currentIndex();
     QMediaContent m = playlist->currentMedia();
@@ -211,7 +218,7 @@ void Player::remove()
     playlist->removeMedia(index);
 }
 
-void Player::slotGrabFullScreen()
+void Player::slotGrabFullScreen()  // get a screenshot
 {
     QScreen *screen = QGuiApplication::primaryScreen();
     QString filePathName = "full-";
@@ -222,7 +229,7 @@ void Player::slotGrabFullScreen()
     }
 }
 
-void Player::setState(QMediaPlayer::State state)
+void Player::setState(QMediaPlayer::State state)  //set button state according to video state
 {
     if (state != playerState) {
         playerState = state;
@@ -243,7 +250,7 @@ void Player::setState(QMediaPlayer::State state)
     }
 }
 
-void Player::playClicked()
+void Player::playClicked()  //control video playback and pause according to video state
 {
     switch (playerState) {
     case QMediaPlayer::StoppedState:
@@ -257,12 +264,12 @@ void Player::playClicked()
 }
 
 
-void Player::onVolumeSliderValueChanged()
+void Player::onVolumeSliderValueChanged()  //emit a signal that changes the volume
 {
     emit changeVolume(volume());
 }
 
-int Player::volume() const
+int Player::volume() const  //change the volume
 {
     qreal linearVolume =  QAudio::convertVolume(ui->volumn_slider->value() / qreal(100),
                                                 QAudio::LogarithmicVolumeScale,
@@ -280,7 +287,8 @@ void Player::setMuted(bool muted)
         if (muted ==true){
             volumn = ui->volumn_slider->value();
             ui->volumn_slider->setValue(0);
-        }else{
+        }
+        else{
             ui->volumn_slider->setValue(volumn);
         }
     }
@@ -318,7 +326,7 @@ void Player::setPath(std::string fpath){
     path = fpath;
 }
 
-void Player::add()
+void Player::add()  //open all videos in the specified path
 {
     QFileDialog fileDialog(this);
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -332,7 +340,8 @@ void Player::add()
     if (path==""){
         fileDialog.setDirectory(QStandardPaths::standardLocations
            (QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
-    }else{
+    }
+    else{
         fileDialog.setDirectory(Qpath);
     }
 
@@ -359,6 +368,7 @@ void Player::add()
     ui->oB->setEnabled(false);
 }
 
+// set the stylesheet of the buttons
 void Player::buttonStyle(Ui::Player* ui){
     ui->stopB->setStyleSheet("QAbstractButton{\
                              background-color:#99CCFF}\

@@ -28,7 +28,6 @@ void ItemDelegate::paint(QPainter *painter,
 
         QStyleOptionViewItem viewOption(option);
         //draw item
-
         QRectF rect;
         rect.setX(option.rect.x());
         rect.setY(option.rect.y());
@@ -50,11 +49,13 @@ void ItemDelegate::paint(QPainter *painter,
             painter->setPen(QPen(Qt::blue));
             painter->setBrush(QColor(229, 241, 255));
             painter->drawPath(path);
-        }else if(option.state.testFlag(QStyle::State_MouseOver)){
+        }
+        else if(option.state.testFlag(QStyle::State_MouseOver)){
             painter->setPen(QPen(Qt::darkGray));
             painter->setBrush(Qt::NoBrush);
             painter->drawPath(path);
-        }else{
+        }
+        else{
             painter->setPen(QPen(Qt::black));
             painter->setBrush(Qt::NoBrush);
             painter->drawPath(path);
